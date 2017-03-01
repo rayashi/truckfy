@@ -53,7 +53,8 @@ def near_trucks(request):
 
     for truck in Truck.objects.all():
         truck.distance = truck.get_distance(location=location)
-        trucks.append(truck)
+        if truck.distance:
+            trucks.append(truck)
 
     trucks.sort(key=attrgetter('distance'), reverse=False)
     paginator = Paginator(trucks, 10)

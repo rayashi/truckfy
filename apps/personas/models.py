@@ -39,6 +39,8 @@ class Truck(models.Model):
         return self.name
 
     def get_distance(self, location):
+        if not self.checkin_set.all().exists():
+            return None
         truck_location = (float(self.checkin_set.last().latitude), float(self.checkin_set.last().longitude))
         if not location or not truck_location:
             return None
