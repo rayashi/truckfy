@@ -10,8 +10,8 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'avatar')
 
 
-class TruckSerializer(serializers.ModelSerializer):
+class TruckSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField(max_length=200)
+    distance = serializers.FloatField()
 
-    class Meta:
-        model = Client
-        fields = ('id', 'name', 'avatar')

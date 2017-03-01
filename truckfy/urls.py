@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from truckfy.api_urls import *
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^personas/', include('apps.personas.urls')),
+    url(r'^', include(router.urls)),
+    url(r'^', include('apps.personas.urls')),
+    url(r'^', include('apps.location.urls')),
+    url(r'^', include('apps.menu.urls')),
     url(r'^', include('apps.auth.urls'))
 ]

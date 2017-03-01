@@ -1,12 +1,9 @@
-from django.conf.urls import url, include
-from rest_framework import routers
+from django.conf.urls import url
 
-from . import views
-
-router = routers.DefaultRouter(trailing_slash=True)
-router.register(r'client', views.ClientViewSet)
-router.register(r'truck', views.TruckViewSet)
+from apps.personas import views
 
 urlpatterns = [
-    url(r'^', include(router.urls)),
+    url(r'^truck/register', views.truck_register),
+    url(r'^truck/image', views.truck_image),
+    url(r'^client/register', views.client_register),
 ]
