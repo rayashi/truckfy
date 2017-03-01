@@ -27,11 +27,11 @@ def truck_checkin(request):
     except TypeError:
         return Response(status=422, data={'Please enter a valid location'})
 
-    try:
+    if CheckIn.objects.filter(truck=truck).exists():
         checkin = CheckIn.objects.filter(truck=truck)[0]
         checkin.latitude = latitude
         checkin.longitude = longitude
-    except CheckIn.DoesNotExist:
+    else:
         CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude)
     return Response(status=200, data={'Checkin saved'})
 
