@@ -1,1 +1,1 @@
-web: gunicorn pdvision.wsgi --timeout 600 --log-file -
+web: gunicorn truckfy.wsgi --timeout 600 --log-file -
