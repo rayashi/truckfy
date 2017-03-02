@@ -7,4 +7,4 @@ class DishSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dish
-        fields = ('id', 'truck', 'name', 'price')
+        fields = ('id', 'truck', 'name', 'text', 'price')

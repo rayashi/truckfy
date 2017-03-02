@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from operator import attrgetter
 from django.db import transaction
+from rest_framework.permissions import IsAuthenticated
 
 from apps.personas.serializers import *
 from apps.location.models import *
@@ -12,10 +13,8 @@ from apps.location.models import *
 
 @transaction.atomic
 @api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
 def truck_checkin(request):
-    if request.user.is_anonymous():
-        return Response(status=422, data={'Access denied, You are not a truck user'})
-
     try:
         latitude = float(request.data['latitude'])
         longitude = float(request.data['longitude'])

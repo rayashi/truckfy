@@ -27,7 +27,7 @@ class Truck(models.Model):
     email = models.EmailField(blank=True, null=True, default=None)
     phone = models.CharField(max_length=30, blank=True, null=True, default=None)
     user = models.OneToOneField(User, blank=True, null=True, default=None)
-    avatar = models.ImageField(upload_to=client_path, max_length=200, blank=True, null=True, default=None)
+    avatar = models.ImageField(upload_to=truck_path, max_length=200, blank=True, null=True, default=None)
     pin = models.CharField(max_length=5, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
