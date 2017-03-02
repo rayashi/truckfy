@@ -52,7 +52,7 @@ LOGGING = {
 # CELERY_SEND_EVENTS = False # Will not create celeryev.* queues
 # CELERY_EVENT_QUEUE_EXPIRES = 60 # Will delete all celeryev. queues without consumers after 1 minute.
 
-AWS_STORAGE_BUCKET_NAME = 'truckfy'
+AWS_STORAGE_BUCKET_NAME = 'truckfy-api'
 AWS_ACCESS_KEY_ID = 'AKIAJXZ72JKL3MZCFCKQ'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
