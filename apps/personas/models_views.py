@@ -15,5 +15,5 @@ class ClientViewSet(viewsets.ModelViewSet):
 class TruckViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrRead,)
     queryset = Truck.objects.all()
-    serializer_class = TruckSerializer
+    serializer_class = TruckModelSerializer
     pagination_class = StandardResultsSetPagination

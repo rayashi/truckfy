@@ -33,3 +33,9 @@ class RegistersTestCase(TestCase):
         token = Token.objects.get(user=truck.user).key
         self.assertEqual(response.json().get('token'), token)
         print('-- > Client register is ok, token = ' + token)
+
+    def test_truck_list(self):
+        """Testa busca da lista de truck"""
+        response = self.c.get('/truck/', data={}, format='json')
+        self.assertEqual(response.status_code, 200)
+        print('-- > Truck list is ok')

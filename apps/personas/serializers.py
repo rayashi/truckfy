@@ -7,7 +7,14 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ('id', 'name', 'avatar')
+        fields = ('id', 'name', 'avatar', 'email')
+
+
+class TruckModelSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Truck
+        fields = ('id', 'name', 'avatar', 'owner_name', 'email', 'phone', 'created_at')
 
 
 class TruckSerializer(serializers.Serializer):
