@@ -13,5 +13,8 @@ class ClientSerializer(serializers.ModelSerializer):
 class TruckSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField(max_length=200)
+    avatar = serializers.ImageField()
+    phone = serializers.CharField()
+    email = serializers.EmailField()
     distance = serializers.FloatField()
 
