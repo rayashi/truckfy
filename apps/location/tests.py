@@ -41,8 +41,7 @@ class NearTrucksTestCase(TestCase):
         self.checkin(truck=truck, location=('-18.917177', '-48.270420'))
         user = User.objects.create_user(first_name='João', username="joao@truckfy.com", email="joao@truckfy.com", password="123")
         Token.objects.create(user=user)
-        truck = Truck.objects.create(name="Brigadeiro", owner_name="João", email="joao@truckfy.com", user=user)
-        self.checkin(truck=truck, location=('-18.934400', '-48.269631'))
+        Truck.objects.create(name="Brigadeiro", owner_name="João", email="joao@truckfy.com", user=user)
 
     def test_near_trucks(self):
         """Testa busca por trucks"""
