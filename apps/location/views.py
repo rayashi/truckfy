@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from operator import attrgetter
 from django.db import transaction
 from rest_framework.permissions import IsAuthenticated
+import googlemaps
 
 from apps.personas.serializers import *
 from apps.location.models import *
@@ -26,12 +27,21 @@ def truck_checkin(request):
     except TypeError:
         return Response(status=422, data={'Please enter a valid location'})
 
+    gmaps = googlemaps.Client(key='AIzaSyBXrCfiQP0GgAtqtzpmQzWqCwwLj9q4X_Q')
+    gmaps_result = gmaps.reverse_geocode(latlng=(latitude, longitude), result_type='street_address')
+    if gmaps_result:
+        formatted_address = gmaps_result[0].get('formatted_address')
+    else:
+        formatted_address = None
+
     if CheckIn.objects.filter(truck=truck).exists():
         checkin = CheckIn.objects.filter(truck=truck)[0]
         checkin.latitude = latitude
         checkin.longitude = longitude
+        checkin.formatted_address = formatted_address
+        checkin.save()
     else:
-        CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude)
+        CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude, formatted_address=formatted_address)
     return Response(status=200, data={'Checkin saved'})
 
 
@@ -51,8 +61,9 @@ def near_trucks(request):
     trucks = []
 
     for truck in Truck.objects.all():
-        truck.distance = truck.get_distance(location=location)
-        if truck.distance:
+        truck.distance = int(truck.get_distance(location=location))
+        truck.formatted_address = truck.get_formatted_address()
+        if truck.distance == 0 or truck.distance:
             trucks.append(truck)
 
     trucks.sort(key=attrgetter('distance'), reverse=False)

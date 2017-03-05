@@ -45,3 +45,8 @@ class Truck(models.Model):
         if not location or not truck_location:
             return None
         return distance(location, truck_location).meters
+
+    def get_formatted_address(self):
+        if not self.checkin_set.all().exists():
+            return None
+        return self.checkin_set.last().formatted_address
