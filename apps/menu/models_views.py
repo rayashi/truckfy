@@ -8,5 +8,5 @@ class DishViewSet(viewsets.ModelViewSet):
     permission_classes = (DishOwnerOrRead,)
     queryset = Dish.objects.all()
     serializer_class = DishSerializer
-    pagination_class = StandardResultsSetPagination
-
+    # pagination_class = StandardResultsSetPagination
+    filter_fields = ('truck',)

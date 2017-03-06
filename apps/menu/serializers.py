@@ -4,6 +4,7 @@ from .models import *
 
 
 class DishSerializer(serializers.ModelSerializer):
+    price = serializers.FloatField()
 
     class Meta:
         model = Dish
