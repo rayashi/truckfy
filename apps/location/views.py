@@ -63,6 +63,8 @@ def near_trucks(request):
     for truck in Truck.objects.all():
         truck.distance = truck.get_distance(location=location)
         truck.formatted_address = truck.get_formatted_address()
+        truck.latitude = truck.get_latitude()
+        truck.longitude = truck.get_longitude()
         if truck.distance == 0 or truck.distance:
             truck.distance = int(truck.distance)
             trucks.append(truck)

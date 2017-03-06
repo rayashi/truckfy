@@ -50,3 +50,13 @@ class Truck(models.Model):
         if not self.checkin_set.all().exists():
             return None
         return self.checkin_set.last().formatted_address
+
+    def get_latitude(self):
+        if not self.checkin_set.all().exists():
+            return None
+        return self.checkin_set.last().latitude
+
+    def get_longitude(self):
+        if not self.checkin_set.all().exists():
+            return None
+        return self.checkin_set.last().longitude

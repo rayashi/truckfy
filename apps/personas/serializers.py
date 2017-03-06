@@ -25,4 +25,6 @@ class TruckSerializer(serializers.Serializer):
     email = serializers.EmailField()
     distance = serializers.FloatField()
     formatted_address = serializers.CharField()
+    latitude = serializers.CharField()
+    longitude = serializers.CharField()
 
