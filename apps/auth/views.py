@@ -23,7 +23,7 @@ def get_user_authenticated(request):
     if client:
         response = {
             'userType': 'client',
-            'truck': TruckModelSerializer(truck, many=False).data
+            'client': ClientSerializer(client, many=False).data
         }
     elif truck:
         response = {
