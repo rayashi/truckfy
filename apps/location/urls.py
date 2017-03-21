@@ -4,6 +4,6 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^near-trucks/', views.near_trucks),
+    url(r'^near-trucks', views.near_trucks),
     url(r'^checkin', views.truck_checkin)
 ]

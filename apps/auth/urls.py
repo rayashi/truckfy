@@ -3,5 +3,5 @@ from django.conf.urls import url
 
 
 urlpatterns = [
-    url(r'^login/', rest_views.obtain_auth_token)
+    url(r'^login', rest_views.obtain_auth_token)
 ]

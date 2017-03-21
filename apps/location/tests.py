@@ -20,7 +20,7 @@ class CheckInTestCase(TestCase):
         token = Token.objects.get(user=truck.user)
         c.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         data = {'latitude': '-18.920359', 'longitude': '-48.274231'}
-        response = c.post('/checkin/', data=data, format='json')
+        response = c.post('/checkin', data=data, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CheckIn.objects.filter(truck=truck)[0].latitude, '-18.920359')
         self.assertEqual(CheckIn.objects.filter(truck=truck)[0].longitude, '-48.274231')
@@ -45,7 +45,7 @@ class NearTrucksTestCase(TestCase):
 
     def test_near_trucks(self):
         """Testa busca por trucks"""
-        response = self.c.get('/near-trucks/', data={'latitude': '-18.919425', 'longitude': '-48.274735'})
+        response = self.c.get('/near-trucks', data={'latitude': '-18.919425', 'longitude': '-48.274735'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('neartrucks')[0].get('name'), 'Pizza')
         print('-- > Near trucks is ok, the first is '+response.json().get('neartrucks')[0].get('name'))
@@ -54,4 +54,5 @@ class NearTrucksTestCase(TestCase):
         token = Token.objects.get(user=truck.user)
         self.c.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         data = {'latitude': location[0], 'longitude': location[1]}
-        self.c.post('/checkin/', data=data, format='json')
+        response = self.c.post('/checkin', data=data, format='json')
+        self.assertEqual(response.status_code, 200)
