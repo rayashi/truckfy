@@ -13,6 +13,8 @@ class Client(models.Model):
     following = models.ManyToManyField('personas.Truck', blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
+    latitude = models.CharField(max_length=50, blank=True, null=True, default=None)
+    longitude = models.CharField(max_length=50, blank=True, null=True, default=None)
 
     class Meta:
         verbose_name_plural = 'Clientes'
@@ -31,6 +33,8 @@ class Truck(models.Model):
     pin = models.CharField(max_length=5, blank=True, null=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, editable=False)
+    review_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0, blank=True, null=True)
+    review_amount = models.IntegerField(default=0, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = 'Food Trucks'

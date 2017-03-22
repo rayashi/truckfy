@@ -14,7 +14,8 @@ class TruckModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Truck
-        fields = ('id', 'name', 'avatar', 'owner_name', 'email', 'phone', 'created_at')
+        fields = ('id', 'name', 'avatar', 'owner_name', 'email', 'phone', 'created_at',
+                  'review_rate', 'review_amount')
 
 
 class TruckSerializer(serializers.Serializer):
@@ -27,4 +28,5 @@ class TruckSerializer(serializers.Serializer):
     formatted_address = serializers.CharField()
     latitude = serializers.CharField()
     longitude = serializers.CharField()
-
+    review_rate = serializers.DecimalField(max_digits=10, decimal_places=1)
+    review_amount = serializers.IntegerField()

@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^', include('apps.personas.urls')),
     url(r'^', include('apps.location.urls')),
     url(r'^', include('apps.menu.urls')),
-    url(r'^', include('apps.auth.urls'))
+    url(r'^', include('apps.auth.urls')),
+    url(r'^', include('apps.reviews.urls'))
 ]
