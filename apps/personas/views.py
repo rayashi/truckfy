@@ -1,10 +1,11 @@
 from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from django.db import transaction
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 
-from apps.personas.models import *
+from apps.personas.serializers import *
 from apps.personas.utils import *
 
 
@@ -52,12 +53,10 @@ def client_register(request):
     return Response({'token': token[0].pk}, status=200)
 
 
+@permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
 def truck_image(request):
-    if request.user.is_anonymous():
-        return Response(status=422, data={'error': 'Access denied, You are not a truck user'})
-
     try:
         truck = Truck.objects.get(user=request.user)
     except Truck.DoesNotExist:
@@ -71,12 +70,10 @@ def truck_image(request):
     return Response(status=200)
 
 
+@permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
 def client_image(request):
-    if request.user.is_anonymous():
-        return Response(status=422, data={'error': 'Access denied, You are not a client'})
-
     try:
         client = Client.objects.get(user=request.user)
     except Truck.DoesNotExist:
@@ -89,3 +86,64 @@ def client_image(request):
     client.save()
     return Response(status=200)
 
+
+@permission_classes((IsAuthenticated, ))
+@api_view(['GET'])
+def is_following(request):
+    try:
+        client = Client.objects.get(user=request.user)
+        resp = client.following.filter(id=int(request.query_params['truck'])).exists()
+        return Response(status=200, data={'is_following': resp})
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'error': 'Truck does not exist'})
+    except Client.DoesNotExist:
+        return Response(status=422, data={'error': 'You are not a client'})
+    except (MultiValueDictKeyError, KeyError):
+        return Response(status=422, data={'Truck Id is required'})
+
+
+@permission_classes((IsAuthenticated, ))
+@api_view(['GET'])
+def list_following(request):
+    try:
+        client = Client.objects.get(user=request.user)
+        following = TruckModelSerializer(client.following.all(), many=True).data
+        return Response(status=200, data={'following': following})
+    except Client.DoesNotExist:
+        return Response(status=422, data={'error': 'You are not a client'})
+
+
+@transaction.atomic()
+@permission_classes((IsAuthenticated, ))
+@api_view(['POST'])
+def follow(request):
+    try:
+        truck = int(request.data['truck'])
+        client = Client.objects.get(user=request.user)
+        client.following.add(truck)
+        client.save()
+        return Response(status=200, data={'following': True})
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'error': 'Truck does not exist'})
+    except Client.DoesNotExist:
+        return Response(status=422, data={'error': 'You are not a client'})
+    except (MultiValueDictKeyError, KeyError):
+        return Response(status=422, data={'Truck Id is required'})
+
+
+@transaction.atomic()
+@permission_classes((IsAuthenticated, ))
+@api_view(['POST'])
+def unfollow(request):
+    try:
+        truck = int(request.data['truck'])
+        client = Client.objects.get(user=request.user)
+        client.following.remove(truck)
+        client.save()
+        return Response(status=200, data={'following': False})
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'error': 'Truck does not exist'})
+    except Client.DoesNotExist:
+        return Response(status=422, data={'error': 'You are not a client'})
+    except (MultiValueDictKeyError, KeyError):
+        return Response(status=422, data={'Truck Id is required'})
