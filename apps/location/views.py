@@ -60,13 +60,14 @@ def near_trucks(request):
 
     trucks = []
 
-    try:
-        client = Client.objects.get(user=request.user)
-        client.latitude = latitude
-        client.longitude = longitude
-        client.save()
-    except Client.DoesNotExist:
-        pass
+    if not request.user.is_anonymous():
+        try:
+            client = Client.objects.get(user=request.user)
+            client.latitude = latitude
+            client.longitude = longitude
+            client.save()
+        except Client.DoesNotExist:
+            pass
 
     for truck in Truck.objects.all():
         truck.distance = truck.get_distance(location=location)
