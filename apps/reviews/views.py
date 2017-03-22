@@ -12,7 +12,7 @@ from apps.personas.models import *
 @permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
-def review(request):
+def make_review(request):
 
     try:
         text = request.data['text']

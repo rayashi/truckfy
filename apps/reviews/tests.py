@@ -27,7 +27,7 @@ class RegistersTestCase(TestCase):
         client = Client.objects.get(id=1)
         token = Token.objects.get(user=client.user)
         c1.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        response = c1.post('/review', data={'truck': 1, 'text': 'Muito bom', 'rate': 4}, format='json')
+        response = c1.post('/make-review', data={'truck': 1, 'text': 'Muito bom', 'rate': 4}, format='json')
         self.assertEqual(response.status_code, 200)
-        print('-- > End point /review is ok')
+        print('-- > End point /make-review is ok')
 
