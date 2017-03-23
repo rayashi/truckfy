@@ -13,6 +13,8 @@ from apps.personas.models import *
 @transaction.atomic
 @api_view(['POST'])
 def make_review(request):
+    if request.user.is_anonymous():
+        return Response(status=422, data={'error': 'You are not a client'})
 
     try:
         text = request.data['text']
