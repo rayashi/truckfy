@@ -7,7 +7,7 @@ from apps.reviews.serializers import *
 
 class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrRead,)
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().order_by('-created_at')
     serializer_class = ReviewSerializer
     pagination_class = MediumResultsSetPagination
     filter_fields = ('truck',)
