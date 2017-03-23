@@ -25,7 +25,7 @@ def make_review(request):
         client = Client.objects.get(user=request.user)
         new_review = client.review_set.create(truck=truck, rate=rate, text=text)
 
-        truck.review_amount += 1
+        truck.review_amount = truck.review_set.count()
         truck.review_rate = truck.review_set.all().aggregate(Avg('rate')).get('rate__avg')
         truck.save()
         return Response(status=200, data={'review': ReviewSerializer(new_review, many=False).data})
