@@ -27,6 +27,7 @@ def make_review(request):
 
         truck.review_amount += 1
         truck.review_rate = truck.review_set.all().aggregate(Avg('rate')).get('rate__avg')
+        truck.save()
         return Response(status=200, data={'review': ReviewSerializer(new_review, many=False).data})
     except Client.DoesNotExist:
         return Response(status=422, data={'error': 'You are not a client'})
