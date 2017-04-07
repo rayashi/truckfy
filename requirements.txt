@@ -21,6 +21,7 @@ Pillow==4.0.0
 psycopg2==2.7
 pyparsing==2.1.10
 python-dateutil==2.6.0
+pytz==2017.2
 requests==2.11.1
 s3transfer==0.1.10
 six==1.10.0

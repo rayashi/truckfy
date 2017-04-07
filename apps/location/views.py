@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.utils.datastructures import MultiValueDictKeyError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from rest_framework.response import Response
@@ -9,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 import googlemaps
 
 from apps.personas.serializers import *
-from apps.location.models import *
+from apps.location.serializers import *
 
 
 @transaction.atomic
@@ -42,7 +41,37 @@ def truck_checkin(request):
         checkin.save()
     else:
         CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude, formatted_address=formatted_address)
-    return Response(status=200, data={'Checkin saved'})
+    return Response(status=200, data={'Check-in saved'})
+
+
+@transaction.atomic
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+def truck_checkout(request):
+    try:
+        truck = Truck.objects.get(user=request.user)
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'Access denied, You are not a truck user'})
+
+    CheckIn.objects.filter(truck=truck).delete()
+    return Response(status=200, data={'Check-out saved'})
+
+
+@api_view(['GET'])
+def actived_checkin(request):
+    try:
+        truck = Truck.objects.get(id=request.query_params['truck'])
+        checkin = truck.get_actived_checkin()
+        if checkin:
+            response = CheckInSerializer(truck.get_actived_checkin(), many=False).data
+        else:
+            response = None
+        return Response(status=200, data=response)
+
+    except (MultiValueDictKeyError, KeyError):
+        return Response(status=422, data={'Truck is requered'})
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'Truck does not exist'})
 
 
 @api_view(['GET'])
@@ -59,6 +88,7 @@ def near_trucks(request):
         page = 1
 
     trucks = []
+    open_trucks = []
 
     if not request.user.is_anonymous():
         try:
@@ -69,16 +99,24 @@ def near_trucks(request):
         except Client.DoesNotExist:
             pass
 
-    for truck in Truck.objects.all():
+    for truck in Truck.objects.all().exclude(checkin__isnull=True):
         truck.distance = truck.get_distance(location=location)
         truck.formatted_address = truck.get_formatted_address()
         truck.latitude = truck.get_latitude()
         truck.longitude = truck.get_longitude()
         if truck.distance == 0 or truck.distance:
-            truck.distance = int(truck.distance)
             trucks.append(truck)
+            open_trucks.append(truck.id)
 
     trucks.sort(key=attrgetter('distance'), reverse=False)
+
+    for truck in Truck.objects.all().exclude(id__in=open_trucks):
+        truck.distance = None
+        truck.formatted_address = None
+        truck.latitude = None
+        truck.longitude = None
+        trucks.append(truck)
+
     paginator = Paginator(trucks, 10)
 
     try:

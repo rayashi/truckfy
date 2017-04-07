@@ -8,7 +8,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class TruckAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'user', 'avatar', 'created_at')
+    list_display = ('id', 'name', 'phone', 'user', 'avatar', 'created_at')
     search_fields = ['id', 'name']
 
 

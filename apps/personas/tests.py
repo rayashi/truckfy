@@ -4,12 +4,14 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from apps.personas.models import *
+from apps.bill.models import *
 
 
 class RegistersTestCase(TestCase):
     c = APIClient()
 
     def setUp(self):
+        Plan.objects.create(code='TRIAL', name='Gratis 30 dias', length=1)
         user = User.objects.create_user(first_name='José', username="jose@truckfy.com", email="jose@truckfy.com", password="123")
         Token.objects.create(user=user)
         truck1 = Truck.objects.create(name="Pizza", owner_name="José", email="jose@truckfy.com", user=user)
@@ -24,13 +26,14 @@ class RegistersTestCase(TestCase):
 
     def test_truck_register(self):
         """Testa cadastro do truck"""
-        data = {'name': 'Pizza', 'owner_name': 'José', 'email': 'paulo@truckfy.com', 'password': '1223'}
+        data = {'name': 'Pizza', 'owner_name': 'José', 'email': 'paulo@truckfy.com', 'phone':'349803215487', 'password': '1223'}
         response = self.c.post('/truck/register', data=data, format='json')
         self.assertEqual(response.status_code, 200)
 
         truck = Truck.objects.get(email='paulo@truckfy.com')
         token = Token.objects.get(user=truck.user).key
         self.assertEqual(response.json().get('token'), token)
+        self.assertEqual(truck.bill_set.first().paid, True)
         print('-- > Truck register is ok, token = '+token)
 
     def test_client_register(self):

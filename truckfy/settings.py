@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'apps.personas',
     'apps.location',
     'apps.menu',
-    'apps.reviews'
+    'apps.reviews',
+    'apps.bill'
 ]
 
 MIDDLEWARE = [

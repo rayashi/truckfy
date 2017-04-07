@@ -4,9 +4,11 @@ from rest_framework.decorators import api_view, permission_classes
 from django.db import transaction
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
+import datetime
 
 from apps.personas.serializers import *
 from apps.personas.utils import *
+from apps.bill.models import *
 
 
 @transaction.atomic
@@ -16,6 +18,7 @@ def truck_register(request):
         name = request.data['name']
         owner_name = request.data['owner_name']
         email = request.data['email']
+        phone = request.data['phone']
         password = request.data['password']
     except (MultiValueDictKeyError, KeyError):
         return Response(status=422, data={'error': 'All fields are required (name, email, password, owner_name)'})
@@ -27,8 +30,16 @@ def truck_register(request):
                                     last_name=get_last_name(owner_name),
                                     username=email, email=email, password=password)
 
-    Truck.objects.create(name=name, email=email, owner_name=owner_name, user=user)
+    truck = Truck.objects.create(name=name, email=email, phone=phone, owner_name=owner_name, user=user)
     token = Token.objects.get_or_create(user=user)
+
+    try:
+        trial_plan = Plan.objects.get(code='TRIAL')
+        ends_at = datetime.date.today() + datetime.timedelta(trial_plan.length*365/12)
+        Bill.objects.create(truck=truck, plan=trial_plan, price=trial_plan.price, paid=True, ends_at=ends_at)
+    except Plan.DoesNotExist:
+        pass
+
     return Response({'token': token[0].pk}, status=200)
 
 

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from apps.personas.utils import *
 from geopy.distance import distance
+import pytz
 
 
 class Client(models.Model):
@@ -43,24 +44,33 @@ class Truck(models.Model):
         return self.name
 
     def get_distance(self, location):
-        if not self.checkin_set.all().exists():
+        last_checkin = self.get_actived_checkin()
+        if not last_checkin:
             return None
-        truck_location = (float(self.checkin_set.last().latitude), float(self.checkin_set.last().longitude))
+        truck_location = (float(last_checkin.latitude), float(last_checkin.longitude))
         if not location or not truck_location:
             return None
-        return distance(location, truck_location).meters
+        return int(distance(location, truck_location).meters)
 
     def get_formatted_address(self):
-        if not self.checkin_set.all().exists():
+        last_checkin = self.get_actived_checkin()
+        if not last_checkin:
             return None
-        return self.checkin_set.last().formatted_address
+        return last_checkin.formatted_address
 
     def get_latitude(self):
-        if not self.checkin_set.all().exists():
+        last_checkin = self.get_actived_checkin()
+        if not last_checkin:
             return None
-        return self.checkin_set.last().latitude
+        return last_checkin.latitude
 
     def get_longitude(self):
-        if not self.checkin_set.all().exists():
+        last_checkin = self.get_actived_checkin()
+        if not last_checkin:
             return None
-        return self.checkin_set.last().longitude
+        return last_checkin.longitude
+
+    def get_actived_checkin(self):
+        now = pytz.datetime.datetime.now().astimezone(pytz.timezone('UTC'))
+        limit_time = now - pytz.datetime.timedelta(hours=12)
+        return self.checkin_set.filter(updated_at__gt=limit_time).order_by('created_at').last()

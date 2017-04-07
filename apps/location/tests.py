@@ -24,7 +24,13 @@ class CheckInTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CheckIn.objects.filter(truck=truck)[0].latitude, '-18.920359')
         self.assertEqual(CheckIn.objects.filter(truck=truck)[0].longitude, '-48.274231')
-        print('-- > Truck Checkin is ok ')
+
+        response = c.get('/actived-checkin', data={'truck': truck.id})
+        self.assertEqual(response.status_code, 200)
+
+        response = c.post('/checkout')
+        self.assertEqual(response.status_code, 200)
+        print('-- > Truck Check-in and Check-out is ok ')
 
 
 class NearTrucksTestCase(TestCase):
