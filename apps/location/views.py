@@ -65,7 +65,7 @@ def actived_checkin(request):
         if checkin:
             response = CheckInSerializer(truck.get_actived_checkin(), many=False).data
         else:
-            response = None
+            response = False
         return Response(status=200, data=response)
 
     except (MultiValueDictKeyError, KeyError):
@@ -99,7 +99,7 @@ def near_trucks(request):
         except Client.DoesNotExist:
             pass
 
-    for truck in Truck.objects.all().exclude(checkin__isnull=True):
+    for truck in Truck.objects.all().exclude(checkin__isnull=True).order_by('-review_rate'):
         truck.distance = truck.get_distance(location=location)
         truck.formatted_address = truck.get_formatted_address()
         truck.latitude = truck.get_latitude()
@@ -110,7 +110,7 @@ def near_trucks(request):
 
     trucks.sort(key=attrgetter('distance'), reverse=False)
 
-    for truck in Truck.objects.all().exclude(id__in=open_trucks):
+    for truck in Truck.objects.all().exclude(id__in=open_trucks).order_by('-review_rate'):
         truck.distance = None
         truck.formatted_address = None
         truck.latitude = None
