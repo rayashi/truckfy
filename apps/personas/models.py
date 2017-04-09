@@ -72,5 +72,4 @@ class Truck(models.Model):
 
     def get_actived_checkin(self):
         now = pytz.datetime.datetime.now().astimezone(pytz.timezone('UTC'))
-        limit_time = now - pytz.datetime.timedelta(hours=12)
-        return self.checkin_set.filter(updated_at__gt=limit_time).order_by('created_at').last()
+        return self.checkin_set.filter(expires_at__gt=now).order_by('created_at').last()

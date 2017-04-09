@@ -26,6 +26,11 @@ def truck_checkin(request):
     except TypeError:
         return Response(status=422, data={'Please enter a valid location'})
 
+    try:
+        duration = int(request.data['duration'])
+    except (MultiValueDictKeyError, KeyError):
+        duration = 6
+
     gmaps = googlemaps.Client(key='AIzaSyBXrCfiQP0GgAtqtzpmQzWqCwwLj9q4X_Q')
     gmaps_result = gmaps.reverse_geocode(latlng=(latitude, longitude), result_type='street_address')
     if gmaps_result:
@@ -33,14 +38,18 @@ def truck_checkin(request):
     else:
         formatted_address = None
 
+    now = pytz.datetime.datetime.now().astimezone(pytz.timezone('UTC'))
+    expires_at = now + pytz.datetime.timedelta(hours=duration)
     if CheckIn.objects.filter(truck=truck).exists():
         checkin = CheckIn.objects.filter(truck=truck)[0]
         checkin.latitude = latitude
         checkin.longitude = longitude
         checkin.formatted_address = formatted_address
+        checkin.expires_at = expires_at
         checkin.save()
     else:
-        CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude, formatted_address=formatted_address)
+        CheckIn.objects.create(truck=truck, latitude=latitude, longitude=longitude,
+                               formatted_address=formatted_address, expires_at=expires_at)
     return Response(status=200, data={'Check-in saved'})
 
 
@@ -63,7 +72,7 @@ def actived_checkin(request):
         truck = Truck.objects.get(id=request.query_params['truck'])
         checkin = truck.get_actived_checkin()
         if checkin:
-            response = CheckInSerializer(truck.get_actived_checkin(), many=False).data
+            response = CheckInSerializer(checkin, many=False).data
         else:
             response = False
         return Response(status=200, data=response)

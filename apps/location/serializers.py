@@ -7,4 +7,5 @@ class CheckInSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CheckIn
-        fields = ('id', 'truck', 'latitude', 'longitude', 'formatted_address', 'created_at', 'updated_at')
+        fields = ('id', 'truck', 'latitude', 'longitude', 'formatted_address',
+                  'expires_at', 'created_at', 'updated_at')
