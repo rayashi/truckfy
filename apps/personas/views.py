@@ -80,7 +80,7 @@ def truck_image(request):
         truck.avatar.delete()
     truck.avatar = file
     truck.save()
-    return Response(status=200, data={'avatar': truck.avatar})
+    return Response(status=200, data={'avatar': truck.avatar.url})
 
 
 @transaction.atomic
@@ -99,7 +99,7 @@ def client_image(request):
         client.avatar.delete()
     client.avatar = file
     client.save()
-    return Response(status=200, data={'avatar': client.avatar})
+    return Response(status=200, data={'avatar': client.avatar.url})
 
 
 @api_view(['GET'])
