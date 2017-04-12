@@ -24,7 +24,7 @@ def truck_register(request):
         return Response(status=422, data={'error': 'All fields are required (name, email, password, owner_name)'})
 
     if User.objects.filter(email=email).exists():
-        return Response(status=422, data={'error': 'Email used'})
+        return Response(status=422, data={'error': 'USED_EMAIL'})
 
     user = User.objects.create_user(first_name=get_first_name(owner_name),
                                     last_name=get_last_name(owner_name),
@@ -45,6 +45,41 @@ def truck_register(request):
 
 @transaction.atomic
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsTruck])
+def truck_update(request):
+    try:
+        truck = Truck.objects.get(user=request.user)
+    except Truck.DoesNotExist:
+        return Response(status=422, data={'Access denied, You are not a truck user'})
+    try:
+        truck.name = request.data['name']
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    try:
+        truck.owner_name = request.data['owner_name']
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    try:
+        truck.email = request.data['email']
+        if not User.objects.filter(username=truck.email).exists():
+            truck.user.email = truck.email
+            truck.user.username = truck.user.email
+            truck.user.save()
+        else:
+            return Response(status=422, data={'error': 'USED_EMAIL'})
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    try:
+        truck.phone = request.data['phone']
+    except (MultiValueDictKeyError, KeyError):
+        pass
+
+    truck.save()
+    return Response(status=200, data=TruckModelSerializer(truck, many=False).data)
+
+
+@transaction.atomic
+@api_view(['POST'])
 def client_register(request):
     try:
         name = request.data['name']
@@ -54,7 +89,7 @@ def client_register(request):
         return Response(status=422, data={'error': 'All fields are required (name, email, password)'})
 
     if User.objects.filter(email=email).exists():
-        return Response(status=422, data={'error': 'Email used'})
+        return Response(status=422, data={'error': 'USED_EMAIL'})
 
     user = User.objects.create_user(first_name=get_first_name(name), last_name=get_last_name(name),
                                     username=email, email=email, password=password)
@@ -62,6 +97,36 @@ def client_register(request):
     Client.objects.create(name=name, email=email, user=user)
     token = Token.objects.get_or_create(user=user)
     return Response({'token': token[0].pk}, status=200)
+
+
+@transaction.atomic
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsClient])
+def client_update(request):
+    try:
+        client = Client.objects.get(user=request.user)
+    except Client.DoesNotExist:
+        return Response(status=422, data={'Access denied, You are not a client user'})
+    try:
+        client.name = request.data['name']
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    try:
+        client.email = request.data['email']
+        if not User.objects.filter(username=client.email).exists():
+            client.user.email = client.email
+            client.user.username = client.user.email
+            client.user.save()
+        else:
+            return Response(status=422, data={'error': 'USED_EMAIL'})
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    try:
+        client.phone = request.data['phone']
+    except (MultiValueDictKeyError, KeyError):
+        pass
+    client.save()
+    return Response(status=200, data=ClientSerializer(client, many=False).data)
 
 
 @transaction.atomic

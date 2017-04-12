@@ -26,7 +26,7 @@ class RegistersTestCase(TestCase):
 
     def test_truck_register(self):
         """Testa cadastro do truck"""
-        data = {'name': 'Pizza', 'owner_name': 'José', 'email': 'paulo@truckfy.com', 'phone':'349803215487', 'password': '1223'}
+        data = {'name': 'Pizza', 'owner_name': 'José', 'email': 'paulo@truckfy.com', 'phone': '349803215487', 'password': '1223'}
         response = self.c.post('/truck/register', data=data, format='json')
         self.assertEqual(response.status_code, 200)
 
@@ -35,6 +35,17 @@ class RegistersTestCase(TestCase):
         self.assertEqual(response.json().get('token'), token)
         self.assertEqual(truck.bill_set.first().paid, True)
         print('-- > Truck register is ok, token = '+token)
+
+    def test_truck_update(self):
+        """Testa atualizacao do truck"""
+        c = APIClient()
+        truck = Truck.objects.get(id=1)
+        token = Token.objects.get(user=truck.user)
+        c.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {'name': 'Pizza 2', 'owner_name': 'José 2', 'email': 'paulo2@truckfy.com', 'phone': '3499999999'}
+        response = c.post('/truck/update', data=data, format='json')
+        self.assertEqual(response.status_code, 200)
+        print('-- > Truck update is ok')
 
     def test_client_register(self):
         """Testa cadastro do cliente"""
@@ -46,6 +57,17 @@ class RegistersTestCase(TestCase):
         token = Token.objects.get(user=truck.user).key
         self.assertEqual(response.json().get('token'), token)
         print('-- > Client register is ok, token = ' + token)
+
+    def test_client_update(self):
+        """Testa atualizacao do truck"""
+        c = APIClient()
+        truck = Client.objects.get(id=1)
+        token = Token.objects.get(user=truck.user)
+        c.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        data = {'name': 'José da Silva 2', 'email': 'monoel2@truckfy.com', 'password': '1223'}
+        response = c.post('/client/update', data=data, format='json')
+        self.assertEqual(response.status_code, 200)
+        print('-- > Client update is ok')
 
     def test_truck_list(self):
         """Testa busca da lista de truck"""
