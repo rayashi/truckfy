@@ -5,6 +5,7 @@ from django.db import transaction
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 import datetime
+from django.db.models import Q
 
 from apps.personas.serializers import *
 from apps.bill.models import *
@@ -61,7 +62,7 @@ def truck_update(request):
         pass
     try:
         truck.email = request.data['email']
-        if not User.objects.filter(username=truck.email).exists():
+        if not User.objects.filter(~Q(id=truck.user.id) & Q(username=truck.email)).exists():
             truck.user.email = truck.email
             truck.user.username = truck.user.email
             truck.user.save()
@@ -113,7 +114,7 @@ def client_update(request):
         pass
     try:
         client.email = request.data['email']
-        if not User.objects.filter(username=client.email).exists():
+        if not User.objects.filter(~Q(id=client.user.id) & Q(username=client.email)).exists():
             client.user.email = client.email
             client.user.username = client.user.email
             client.user.save()
