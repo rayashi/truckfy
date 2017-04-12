@@ -6,12 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Avg
 
 from apps.reviews.serializers import *
-from apps.personas.models import *
+from apps.shared.permission import *
 
 
-@permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsClient])
 def make_review(request):
     if request.user.is_anonymous():
         return Response(status=422, data={'error': 'You are not a client'})

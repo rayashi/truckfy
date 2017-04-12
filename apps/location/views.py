@@ -9,11 +9,12 @@ import googlemaps
 
 from apps.personas.serializers import *
 from apps.location.serializers import *
+from apps.shared.permission import *
 
 
 @transaction.atomic
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes([IsAuthenticated, IsTruck])
 def truck_checkin(request):
     try:
         latitude = float(request.data['latitude'])
@@ -55,7 +56,7 @@ def truck_checkin(request):
 
 @transaction.atomic
 @api_view(['POST'])
-@permission_classes((IsAuthenticated, ))
+@permission_classes([IsAuthenticated, IsTruck])
 def truck_checkout(request):
     try:
         truck = Truck.objects.get(user=request.user)

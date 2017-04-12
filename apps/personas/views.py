@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 import datetime
 
 from apps.personas.serializers import *
-from apps.personas.utils import *
 from apps.bill.models import *
+from apps.shared.permission import *
 
 
 @transaction.atomic
@@ -64,42 +64,46 @@ def client_register(request):
     return Response({'token': token[0].pk}, status=200)
 
 
-@permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsTruck])
 def truck_image(request):
     try:
         truck = Truck.objects.get(user=request.user)
     except Truck.DoesNotExist:
-        return Response(status=422, data={'error': 'Access denied, You are not a truck user'})
-
+        return Response(status=422, data={'Access denied, You are not a truck user'})
+    try:
+        file = request.FILES['file']
+    except MultiValueDictKeyError:
+        return Response(status=422, data={'error': 'File was not sent'})
     if truck.avatar:
         truck.avatar.delete()
-
-    truck.avatar = request.FILES['file']
+    truck.avatar = file
     truck.save()
-    return Response(status=200)
+    return Response(status=200, data={'avatar': truck.avatar})
 
 
-@permission_classes((IsAuthenticated, ))
 @transaction.atomic
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsClient])
 def client_image(request):
     try:
         client = Client.objects.get(user=request.user)
-    except Truck.DoesNotExist:
-        return Response(status=422, data={'error': 'Access denied, You are not a client'})
-
+    except Client.DoesNotExist:
+        return Response(status=422, data={'Access denied, You are not a client user'})
+    try:
+        file = request.FILES['file']
+    except MultiValueDictKeyError:
+        return Response(status=422, data={'error': 'File was not sent'})
     if client.avatar:
         client.avatar.delete()
-
-    client.avatar = request.FILES['file']
+    client.avatar = file
     client.save()
-    return Response(status=200)
+    return Response(status=200, data={'avatar': client.avatar})
 
 
-@permission_classes((IsAuthenticated, ))
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsClient])
 def is_following(request):
     try:
         client = Client.objects.get(user=request.user)
@@ -113,8 +117,8 @@ def is_following(request):
         return Response(status=422, data={'Truck Id is required'})
 
 
-@permission_classes((IsAuthenticated, ))
 @api_view(['GET'])
+@permission_classes([IsAuthenticated, IsClient])
 def list_following(request):
     try:
         client = Client.objects.get(user=request.user)
@@ -125,8 +129,8 @@ def list_following(request):
 
 
 @transaction.atomic()
-@permission_classes((IsAuthenticated, ))
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsClient])
 def follow(request):
     try:
         truck = int(request.data['truck'])
@@ -143,8 +147,8 @@ def follow(request):
 
 
 @transaction.atomic()
-@permission_classes((IsAuthenticated, ))
 @api_view(['POST'])
+@permission_classes([IsAuthenticated, IsClient])
 def unfollow(request):
     try:
         truck = int(request.data['truck'])
